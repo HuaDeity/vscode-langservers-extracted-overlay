@@ -23,36 +23,18 @@ jobs:
             experimental-features = nix-command flakes
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check latest version
-        id: version
-        run: |
-          LATEST=$(curl -fsSL "https://registry.npmjs.org/@zed-industries%2Fvscode-langservers-extracted/latest" | jq -r '.version')
-          CURRENT=$(grep -oP '(?<=version = ")[^"]+' pkgs/vscode-html-languageservice.nix | head -1)
-          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
-          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
-          if [[ "$LATEST" == "$CURRENT" ]]; then
-            echo "outdated=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "outdated=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Run nix-update
-        if: steps.version.outputs.outdated == 'true'
         run: |
           nix run nixpkgs#nix-update -- \
             --flake \
-            --version "${{ steps.version.outputs.latest }}" \
             --commit \
             vscode-html-languageservice
 
       - name: Open PR
-        if: steps.version.outputs.outdated == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          branch: bump/vscode-html-languageservice-${{ steps.version.outputs.latest }}
-          title: "vscode-html-languageservice ${{ steps.version.outputs.latest }}"
+          branch: bump/vscode-html-languageservice
+          title: "vscode-html-languageservice: update"
           body: |
-            Automated version bump from ${{ steps.version.outputs.current }} to ${{ steps.version.outputs.latest }}.
-
-            Updated by [nix-update](https://github.com/Mic92/nix-update).
+            Automated version bump by [nix-update](https://github.com/Mic92/nix-update).
