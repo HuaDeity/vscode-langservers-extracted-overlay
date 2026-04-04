@@ -5,36 +5,28 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   update:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
       - uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run nix-update
+      - name: Update
         run: |
-          nix run nixpkgs#nix-update -- \
-            --flake \
-            --commit \
-            vscode-html-languageservice
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          nix run nixpkgs#nix-update -- --flake --commit vscode-html-languageservice
 
       - name: Open PR
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: bump/vscode-html-languageservice
-          title: "vscode-html-languageservice: update"
-          body: |
-            Automated version bump by [nix-update](https://github.com/Mic92/nix-update).
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git diff HEAD~1 --quiet || \
+            git push origin "HEAD:refs/heads/bump/vscode-html-languageservice" --force && \
+            gh pr create \
+              --head "bump/vscode-html-languageservice" \
+              --title "vscode-html-languageservice: $(nix eval .#vscode-html-languageservice.version --raw)" \
+              --body "Automated version bump by [nix-update](https://github.com/Mic92/nix-update)." \
+              || true
