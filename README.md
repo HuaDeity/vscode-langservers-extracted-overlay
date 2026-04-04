@@ -1,12 +1,27 @@
 # zed-vscode-langservers-overlay
 
-A Nix flake overlay that packages [Zed Industries' fork][fork] of
-`vscode-langservers-extracted` — the HTML/CSS/JSON/ESLint language servers
-extracted from VSCode.
+A Nix flake overlay that provides [Zed Industries' fork][fork] of
+`vscode-langservers-extracted` — the HTML/CSS/JSON/ESLint/Markdown language
+servers extracted from VSCode.
 
-The fork's key customisation is a patched HTML language server that supports
+The fork's key change is a patched HTML language server that supports
 workspace-edit-based HTML tag renaming, a feature required by the
 [Zed editor](https://zed.dev).
+
+## How it works
+
+Two packages are provided:
+
+- **`vscode-html-languageservice`** — builds only the HTML server from the Zed
+  fork. The HTML server is pre-built and committed at `packages/html/lib/` in
+  the fork, so no Babel transpilation is needed.
+- **`vscode-langservers-extracted`** — takes the original nixpkgs package as-is
+  (CSS/JSON/ESLint/Markdown servers) and replaces only the
+  `vscode-html-language-server` symlink with the one from
+  `vscode-html-languageservice` via `symlinkJoin`.
+
+This means the CSS, JSON, ESLint, and Markdown servers are always sourced from
+the well-tested upstream nixpkgs build; only the HTML server is patched.
 
 ---
 
@@ -23,7 +38,6 @@ workspace-edit-based HTML tag renaming, a feature required by the
   };
 
   outputs = { nixpkgs, zed-vscode-langservers, ... }: {
-    # Example: NixOS system configuration
     nixosConfigurations.my-machine = nixpkgs.lib.nixosSystem {
       modules = [{
         environment.systemPackages = [
@@ -38,7 +52,8 @@ workspace-edit-based HTML tag renaming, a feature required by the
 ### With flakes — overlay (replaces `pkgs.vscode-langservers-extracted`)
 
 Applying the overlay means every package in your set that depends on
-`vscode-langservers-extracted` will automatically use the Zed fork.
+`vscode-langservers-extracted` will automatically use the Zed fork's HTML
+server.
 
 ```nix
 # flake.nix
@@ -65,7 +80,7 @@ Applying the overlay means every package in your set that depends on
 {
   nixpkgs.overlays = [
     (import (builtins.fetchTarball {
-      url = "https://github.com/YOUR_ORG/zed-vscode-langservers-overlay/archive/main.tar.gz";
+      url = "https://github.com/HuaDeity/zed-vscode-langservers-overlay/archive/main.tar.gz";
     }))
   ];
 }
@@ -77,9 +92,10 @@ Applying the overlay means every package in your set that depends on
 
 | Output | Description |
 |--------|-------------|
-| `packages.<system>.default` | The Zed fork of `vscode-langservers-extracted` |
-| `packages.<system>.vscode-langservers-extracted` | Same package, named explicitly |
-| `overlays.default` | nixpkgs overlay replacing `pkgs.vscode-langservers-extracted` |
+| `packages.<system>.default` | `vscode-langservers-extracted` with Zed's HTML server |
+| `packages.<system>.vscode-langservers-extracted` | Same as default, named explicitly |
+| `packages.<system>.vscode-html-languageservice` | Only the Zed-patched HTML server |
+| `overlays.default` | nixpkgs overlay replacing `pkgs.vscode-langservers-extracted` and adding `pkgs.vscode-html-languageservice` |
 
 Supported systems: `x86_64-linux`, `x86_64-darwin`, `aarch64-linux`, `aarch64-darwin`.
 
@@ -92,29 +108,24 @@ Supported systems: `x86_64-linux`, `x86_64-darwin`, `aarch64-linux`, `aarch64-da
    url = "github:zed-industries/vscode-langservers-extracted/vX.Y.Z";
    ```
 2. Run `nix flake update` to refresh `flake.lock`.
-3. Update `version` in `pkgs/package.nix` to match.
+3. Update `version` in `pkgs/vscode-html-languageservice.nix` to match.
 4. Recompute the `npmDepsHash`:
-   - Set `npmDepsHash = lib.fakeHash;` in `pkgs/package.nix`.
-   - Run `nix build .#default 2>&1 | grep "got:"` and paste the printed hash.
+   - Set `npmDepsHash = lib.fakeHash;` in `pkgs/vscode-html-languageservice.nix`.
+   - Run `nix build .#vscode-html-languageservice 2>&1 | grep "got:"` and paste the printed hash.
 
 ---
 
 ## Relationship to upstream nixpkgs
 
-This package is derived from
-[`pkgs/by-name/vs/vscode-langservers-extracted/package.nix`][upstream]
-in nixpkgs with the following changes:
+The overlay sources its CSS, JSON, ESLint, and Markdown servers directly from
+[nixpkgs `vscode-langservers-extracted`][upstream] without modification. Only
+the HTML server is replaced.
 
-- **Source**: `zed-industries/vscode-langservers-extracted` instead of
-  `hrsh7th/vscode-langservers-extracted`.
-- **HTML server**: Zed pre-builds and commits the HTML server output at
-  `packages/html/lib/` in the fork.  The Babel transpilation step for HTML is
-  therefore skipped.
-- **Markdown server**: Added — built from VSCodium's
-  `markdown-language-features` extension (same Babel approach as CSS/JSON).
-- **Package layout**: The fork's `package.json` lists `packages/` (not `lib/`)
-  in `files`; a `postPatch` step adds `lib/` so `npm pack` includes the
-  built CSS/JSON/ESLint/Markdown servers.
+The `vscode-html-languageservice` package differs from the nixpkgs HTML server
+in one way: it is built from `zed-industries/vscode-langservers-extracted`
+instead of `hrsh7th/vscode-langservers-extracted`. Zed pre-builds the HTML
+server output and commits it at `packages/html/lib/`, so no Babel transpilation
+step is required.
 
 [fork]: https://github.com/zed-industries/vscode-langservers-extracted
 [upstream]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/vs/vscode-langservers-extracted/package.nix
