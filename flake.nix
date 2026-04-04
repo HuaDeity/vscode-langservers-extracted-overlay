@@ -32,21 +32,30 @@
         { config, pkgs, ... }:
         {
           packages = {
-            default = pkgs.callPackage ./pkgs/package.nix {
+            vscode-html-languageservice = pkgs.callPackage ./pkgs/vscode-html-languageservice.nix {
               src = inputs.vscode-langservers-src;
             };
-            vscode-langservers-extracted = config.packages.default;
+            vscode-langservers-extracted = pkgs.callPackage ./pkgs/vscode-langservers-extracted.nix {
+              vscode-langservers-extracted-upstream = pkgs.vscode-langservers-extracted;
+              vscode-html-languageservice = config.packages.vscode-html-languageservice;
+            };
+            default = config.packages.vscode-langservers-extracted;
           };
         };
 
       flake = {
-        # Drop-in overlay: replaces pkgs.vscode-langservers-extracted with the
-        # Zed fork. Apply via nixpkgs.overlays or pkgs.extend.
         overlays.default =
-          final: _prev:
-          {
-            vscode-langservers-extracted = final.callPackage ./pkgs/package.nix {
+          final: prev:
+          let
+            vscode-html-languageservice = final.callPackage ./pkgs/vscode-html-languageservice.nix {
               src = inputs.vscode-langservers-src;
+            };
+          in
+          {
+            inherit vscode-html-languageservice;
+            vscode-langservers-extracted = final.callPackage ./pkgs/vscode-langservers-extracted.nix {
+              vscode-langservers-extracted-upstream = prev.vscode-langservers-extracted;
+              inherit vscode-html-languageservice;
             };
           };
       };
