@@ -39,22 +39,20 @@ jobs:
       - name: Run nix-update
         if: steps.version.outputs.outdated == 'true'
         run: |
-          nix run nixpkgs#nix-update -- --flake \
+          nix run nixpkgs#nix-update -- \
+            --flake \
             --version "${{ steps.version.outputs.latest }}" \
+            --commit \
             vscode-html-languageservice
 
       - name: Open PR
         if: steps.version.outputs.outdated == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b "bump/vscode-html-languageservice-${{ steps.version.outputs.latest }}"
-          git add pkgs/vscode-html-languageservice.nix
-          git commit -m "vscode-html-languageservice ${{ steps.version.outputs.latest }}"
-          git push origin HEAD
-          gh pr create \
-            --title "vscode-html-languageservice ${{ steps.version.outputs.latest }}" \
-            --body "Automated version bump from ${{ steps.version.outputs.current }} to ${{ steps.version.outputs.latest }}." \
-            --base main
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: bump/vscode-html-languageservice-${{ steps.version.outputs.latest }}
+          title: "vscode-html-languageservice ${{ steps.version.outputs.latest }}"
+          body: |
+            Automated version bump from ${{ steps.version.outputs.current }} to ${{ steps.version.outputs.latest }}.
+
+            Updated by [nix-update](https://github.com/Mic92/nix-update).
