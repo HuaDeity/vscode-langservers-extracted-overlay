@@ -1,4 +1,4 @@
-# zed-vscode-langservers-overlay
+# vscode-langservers-extracted-overlay
 
 A Nix flake overlay that provides [Zed Industries' fork][fork] of
 `vscode-langservers-extracted` — the HTML/CSS/JSON/ESLint/Markdown language
@@ -34,14 +34,14 @@ the well-tested upstream nixpkgs build; only the HTML server is patched.
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    zed-vscode-langservers.url = "github:HuaDeity/zed-vscode-langservers-overlay";
+    vscode-langservers-overlay.url = "github:HuaDeity/vscode-langservers-extracted-overlay";
   };
 
-  outputs = { nixpkgs, zed-vscode-langservers, ... }: {
+  outputs = { nixpkgs, vscode-langservers-overlay, ... }: {
     nixosConfigurations.my-machine = nixpkgs.lib.nixosSystem {
       modules = [{
         environment.systemPackages = [
-          zed-vscode-langservers.packages.x86_64-linux.default
+          vscode-langservers-overlay.packages.x86_64-linux.default
         ];
       }];
     };
@@ -60,13 +60,13 @@ server.
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    zed-vscode-langservers.url = "github:HuaDeity/zed-vscode-langservers-overlay";
+    vscode-langservers-overlay.url = "github:HuaDeity/vscode-langservers-extracted-overlay";
   };
 
-  outputs = { self, nixpkgs, zed-vscode-langservers, ... }: {
+  outputs = { self, nixpkgs, vscode-langservers-overlay, ... }: {
     nixosConfigurations.my-machine = nixpkgs.lib.nixosSystem {
       modules = [{
-        nixpkgs.overlays = [ zed-vscode-langservers.overlays.default ];
+        nixpkgs.overlays = [ vscode-langservers-overlay.overlays.default ];
       }];
     };
   };
@@ -80,7 +80,7 @@ server.
 {
   nixpkgs.overlays = [
     (import (builtins.fetchTarball {
-      url = "https://github.com/HuaDeity/zed-vscode-langservers-overlay/archive/main.tar.gz";
+      url = "https://github.com/HuaDeity/vscode-langservers-extracted-overlay/archive/main.tar.gz";
     }))
   ];
 }

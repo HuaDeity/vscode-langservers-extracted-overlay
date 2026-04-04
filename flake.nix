@@ -1,5 +1,5 @@
 {
-  description = "Nix flake overlay for Zed Industries' fork of vscode-langservers-extracted";
+  description = "Nix flake overlay replacing vscode-langservers-extracted's HTML server with Zed Industries' fork";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
