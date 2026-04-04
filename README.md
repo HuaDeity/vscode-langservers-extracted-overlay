@@ -103,15 +103,14 @@ Supported systems: `x86_64-linux`, `x86_64-darwin`, `aarch64-linux`, `aarch64-da
 
 ## Updating the package version
 
-1. Update the `vscode-langservers-src` input tag in `flake.nix`:
-   ```
-   url = "github:zed-industries/vscode-langservers-extracted/vX.Y.Z";
-   ```
-2. Run `nix flake update` to refresh `flake.lock`.
-3. Update `version` in `pkgs/vscode-html-languageservice.nix` to match.
-4. Recompute the `npmDepsHash`:
-   - Set `npmDepsHash = lib.fakeHash;` in `pkgs/vscode-html-languageservice.nix`.
-   - Run `nix build .#vscode-html-languageservice 2>&1 | grep "got:"` and paste the printed hash.
+Run `nix-update` — it handles everything automatically:
+
+```bash
+nix run nixpkgs#nix-update -- --flake vscode-html-languageservice
+```
+
+This updates `version`, `src.hash`, and `npmDepsHash` in
+`pkgs/vscode-html-languageservice.nix` in one step.
 
 ---
 

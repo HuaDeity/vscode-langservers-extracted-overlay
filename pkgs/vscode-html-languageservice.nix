@@ -1,32 +1,24 @@
-# HTML language server from Zed Industries' fork of vscode-langservers-extracted.
-#
-# The HTML server is pre-built and committed at packages/html/lib/ in the fork,
-# so no Babel transpilation is needed. We only expose vscode-html-language-server
-# and drop the other bins (css/json/eslint/markdown) which come from the original
-# nixpkgs vscode-langservers-extracted.
-#
-# Hashes that need updating when bumping the version:
-#   • vscode-langservers-src input  – update the tag in flake.nix and run
-#                                     `nix flake update`
-#   • npmDepsHash  – set to `lib.fakeHash`, run
-#                    `nix build .#vscode-html-languageservice 2>&1 | grep "got:"`,
-#                    paste result
-
 {
   lib,
   buildNpmPackage,
-  src,
+  fetchFromGitHub,
 }:
 
-buildNpmPackage {
+buildNpmPackage rec {
   pname = "vscode-html-languageservice";
   version = "4.10.7";
 
-  inherit src;
+  src = fetchFromGitHub {
+    owner = "zed-industries";
+    repo = "vscode-langservers-extracted";
+    rev = "v${version}";
+    hash = "sha256-VpCifcSg7H6d03c/BPeW1bHd7xxGff/V3P4pctcJmDY=";
+  };
 
   npmDepsHash = "sha256-G4KROyE0OPdDCEEcZOvQbM/h7PDaBCkrlOrGIoUJ1TY=";
 
-  # The HTML server is pre-built by Zed at packages/html/lib/; skip npm build.
+  # The HTML server is pre-built by Zed and committed at packages/html/lib/.
+  # No build step is required.
   dontNpmBuild = true;
 
   postInstall = ''
@@ -35,11 +27,10 @@ buildNpmPackage {
     find $out/bin -name "vscode-*" ! -name "vscode-html-language-server" -delete
   '';
 
-  meta = with lib; {
+  meta = {
     description = "HTML language server with Zed's workspace-edit tag rename patch";
     homepage = "https://github.com/zed-industries/vscode-langservers-extracted";
-    license = licenses.mit;
-    platforms = platforms.unix;
+    license = lib.licenses.mit;
     mainProgram = "vscode-html-language-server";
   };
 }

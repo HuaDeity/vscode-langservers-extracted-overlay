@@ -39,25 +39,7 @@
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
-        "nixpkgs": "nixpkgs",
-        "vscode-langservers-src": "vscode-langservers-src"
-      }
-    },
-    "vscode-langservers-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1762318462,
-        "narHash": "sha256-VpCifcSg7H6d03c/BPeW1bHd7xxGff/V3P4pctcJmDY=",
-        "owner": "zed-industries",
-        "repo": "vscode-langservers-extracted",
-        "rev": "4f4cc2967588f578c52ce47f1af40c43437b1402",
-        "type": "github"
-      },
-      "original": {
-        "owner": "zed-industries",
-        "ref": "v4.10.7",
-        "repo": "vscode-langservers-extracted",
-        "type": "github"
+        "nixpkgs": "nixpkgs"
       }
     }
   },

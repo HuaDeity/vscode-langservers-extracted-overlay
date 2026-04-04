@@ -7,18 +7,14 @@
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
     };
-    vscode-langservers-src = {
-      url = "github:zed-industries/vscode-langservers-extracted/v4.10.7";
-      flake = false;
-    };
   };
 
-  nixConfig = {
-    extra-substituters = [ "https://vscode-langservers-extracted.cachix.org" ];
-    extra-trusted-public-keys = [
-      "vscode-langservers-extracted.cachix.org-1:REPLACE_WITH_CACHIX_PUBLIC_KEY"
-    ];
-  };
+  # nixConfig = {
+  #   extra-substituters = [ "https://vscode-langservers-extracted.cachix.org" ];
+  #   extra-trusted-public-keys = [
+  #     "vscode-langservers-extracted.cachix.org-1:REPLACE_WITH_CACHIX_PUBLIC_KEY"
+  #   ];
+  # };
 
   outputs =
     inputs:
@@ -61,9 +57,7 @@
           };
 
           packages = {
-            vscode-html-languageservice = pkgs.callPackage ./pkgs/vscode-html-languageservice.nix {
-              src = inputs.vscode-langservers-src;
-            };
+            vscode-html-languageservice = pkgs.callPackage ./pkgs/vscode-html-languageservice.nix { };
             vscode-langservers-extracted = pkgs.callPackage ./pkgs/vscode-langservers-extracted.nix {
               vscode-langservers-extracted-upstream = pkgs.vscode-langservers-extracted;
               vscode-html-languageservice = config.packages.vscode-html-languageservice;
