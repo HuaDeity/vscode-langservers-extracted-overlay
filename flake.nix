@@ -21,20 +21,7 @@
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
         inputs.flake-parts.flakeModules.easyOverlay
-        inputs.flake-parts.flakeModules.partitions
       ];
-
-      # checks and herculesCI live in the dev partition so they do not appear
-      # in consumers' lock files.
-      partitionedAttrs = {
-        checks = "dev";
-        herculesCI = "dev";
-      };
-
-      partitions.dev = {
-        extraInputsFlake = ./flake/dev;
-        module = ./flake/dev/default.nix;
-      };
 
       systems = [
         "x86_64-linux"
