@@ -1,0 +1,60 @@
+name: Update vscode-html-languageservice
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check latest version
+        id: version
+        run: |
+          LATEST=$(curl -fsSL "https://registry.npmjs.org/@zed-industries%2Fvscode-langservers-extracted/latest" | jq -r '.version')
+          CURRENT=$(grep -oP '(?<=version = ")[^"]+' pkgs/vscode-html-languageservice.nix | head -1)
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          if [[ "$LATEST" == "$CURRENT" ]]; then
+            echo "outdated=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "outdated=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run nix-update
+        if: steps.version.outputs.outdated == 'true'
+        run: |
+          nix run nixpkgs#nix-update -- --flake \
+            --version "${{ steps.version.outputs.latest }}" \
+            vscode-html-languageservice
+
+      - name: Open PR
+        if: steps.version.outputs.outdated == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "bump/vscode-html-languageservice-${{ steps.version.outputs.latest }}"
+          git add pkgs/vscode-html-languageservice.nix
+          git commit -m "vscode-html-languageservice ${{ steps.version.outputs.latest }}"
+          git push origin HEAD
+          gh pr create \
+            --title "vscode-html-languageservice ${{ steps.version.outputs.latest }}" \
+            --body "Automated version bump from ${{ steps.version.outputs.current }} to ${{ steps.version.outputs.latest }}." \
+            --base main
