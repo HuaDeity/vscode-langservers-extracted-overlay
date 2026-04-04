@@ -21,6 +21,10 @@
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        inputs.flake-parts.flakeModules.easyOverlay
+      ];
+
       systems = [
         "x86_64-linux"
         "x86_64-darwin"
@@ -31,6 +35,16 @@
       perSystem =
         { config, pkgs, ... }:
         {
+          # easyOverlay reads overlayAttrs and generates overlays.default automatically.
+          # pkgs here is the base nixpkgs without our overlay applied, so
+          # pkgs.vscode-langservers-extracted is always the upstream package.
+          overlayAttrs = {
+            inherit (config.packages)
+              vscode-html-languageservice
+              vscode-langservers-extracted
+              ;
+          };
+
           packages = {
             vscode-html-languageservice = pkgs.callPackage ./pkgs/vscode-html-languageservice.nix {
               src = inputs.vscode-langservers-src;
@@ -42,22 +56,5 @@
             default = config.packages.vscode-langservers-extracted;
           };
         };
-
-      flake = {
-        overlays.default =
-          final: prev:
-          let
-            vscode-html-languageservice = final.callPackage ./pkgs/vscode-html-languageservice.nix {
-              src = inputs.vscode-langservers-src;
-            };
-          in
-          {
-            inherit vscode-html-languageservice;
-            vscode-langservers-extracted = final.callPackage ./pkgs/vscode-langservers-extracted.nix {
-              vscode-langservers-extracted-upstream = prev.vscode-langservers-extracted;
-              inherit vscode-html-languageservice;
-            };
-          };
-      };
     };
 }

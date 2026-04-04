@@ -22,6 +22,8 @@ symlinkJoin {
           $out/bin/vscode-html-language-server
   '';
 
+  passthru.version = vscode-html-languageservice.version;
+
   meta = vscode-langservers-extracted-upstream.meta // {
     description = "HTML/CSS/JSON/ESLint/Markdown language servers with Zed's patched HTML server";
     homepage = "https://github.com/zed-industries/vscode-langservers-extracted";
