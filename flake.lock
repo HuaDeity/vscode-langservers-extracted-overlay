@@ -1,0 +1,66 @@
+{
+  "nodes": {
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1775087534,
+        "narHash": "sha256-91qqW8lhL7TLwgQWijoGBbiD4t7/q75KTi8NxjVmSmA=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "3107b77cd68437b9a76194f0f7f9c55f2329ca5b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1775126147,
+        "narHash": "sha256-J0dZU4atgcfo4QvM9D92uQ0Oe1eLTxBVXjJzdEMQpD0=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "8d8c1fa5b412c223ffa47410867813290cdedfef",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": "nixpkgs",
+        "vscode-langservers-src": "vscode-langservers-src"
+      }
+    },
+    "vscode-langservers-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1762318462,
+        "narHash": "sha256-VpCifcSg7H6d03c/BPeW1bHd7xxGff/V3P4pctcJmDY=",
+        "owner": "zed-industries",
+        "repo": "vscode-langservers-extracted",
+        "rev": "4f4cc2967588f578c52ce47f1af40c43437b1402",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zed-industries",
+        "ref": "v4.10.7",
+        "repo": "vscode-langservers-extracted",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
