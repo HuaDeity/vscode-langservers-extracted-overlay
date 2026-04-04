@@ -19,7 +19,7 @@ workspace-edit-based HTML tag renaming, a feature required by the
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    zed-vscode-langservers.url = "github:YOUR_ORG/zed-vscode-langservers-overlay";
+    zed-vscode-langservers.url = "github:HuaDeity/zed-vscode-langservers-overlay";
   };
 
   outputs = { nixpkgs, zed-vscode-langservers, ... }: {
@@ -45,7 +45,7 @@ Applying the overlay means every package in your set that depends on
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    zed-vscode-langservers.url = "github:YOUR_ORG/zed-vscode-langservers-overlay";
+    zed-vscode-langservers.url = "github:HuaDeity/zed-vscode-langservers-overlay";
   };
 
   outputs = { self, nixpkgs, zed-vscode-langservers, ... }: {
