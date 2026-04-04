@@ -9,12 +9,12 @@
     };
   };
 
-  # nixConfig = {
-  #   extra-substituters = [ "https://vscode-langservers-extracted.cachix.org" ];
-  #   extra-trusted-public-keys = [
-  #     "vscode-langservers-extracted.cachix.org-1:REPLACE_WITH_CACHIX_PUBLIC_KEY"
-  #   ];
-  # };
+  nixConfig = {
+    extra-substituters = [ "https://huadeity.cachix.org" ];
+    extra-trusted-public-keys = [
+      "huadeity.cachix.org-1:p5RSl+yBzqtjWQZI3gRpvSd7nZXjtscNVAtb1nDo1As="
+    ];
+  };
 
   outputs =
     inputs:
