@@ -27,6 +27,7 @@ jobs:
             --flake \
             --commit \
             --write-commit-message /tmp/commit-message \
+            --url https://registry.npmjs.org/vscode-langservers-extracted \
             vscode-html-languageservice
           AFTER=$(git rev-parse HEAD)
 
