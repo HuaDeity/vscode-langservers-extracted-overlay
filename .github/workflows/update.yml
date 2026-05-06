@@ -2,7 +2,7 @@ name: Update vscode-html-languageservice
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "0 0 * * 1"
   workflow_dispatch:
 
 jobs:
@@ -27,6 +27,7 @@ jobs:
             --flake \
             --commit \
             --write-commit-message /tmp/commit-message \
+            --url https://registry.npmjs.org/@zed-industries/vscode-langservers-extracted \
             vscode-html-languageservice
           AFTER=$(git rev-parse HEAD)
 
