@@ -11,7 +11,10 @@ buildNpmPackage rec {
   src = fetchFromGitHub {
     owner = "zed-industries";
     repo = "vscode-langservers-extracted";
-    rev = "v${version}";
+    # Upstream's release workflow creates a release-v* branch but does not
+    # reliably push the v* tag (e.g. v4.10.8 was never tagged), so track the
+    # release branch instead. The output hash still pins the exact content.
+    rev = "release-v${version}";
     hash = "sha256-VpCifcSg7H6d03c/BPeW1bHd7xxGff/V3P4pctcJmDY=";
   };
 
