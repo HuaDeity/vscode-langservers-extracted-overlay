@@ -5,6 +5,10 @@ on:
     - cron: "0 0 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -43,8 +47,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git push origin "HEAD:refs/heads/bump/vscode-html-languageservice" --force
-          gh pr create \
-            --head "bump/vscode-html-languageservice" \
-            --title "$(cat /tmp/commit-message)" \
-            --body "Automated version bump by [nix-update](https://github.com/Mic92/nix-update)." \
-            || true
+          # Re-running just force-pushes the existing PR's branch; only create
+          # a PR when none is open, so real gh failures aren't masked.
+          if [[ "$(gh pr list --head bump/vscode-html-languageservice --state open --json number --jq length)" == "0" ]]; then
+            gh pr create \
+              --head "bump/vscode-html-languageservice" \
+              --title "$(cat /tmp/commit-message)" \
+              --body "Automated version bump by [nix-update](https://github.com/Mic92/nix-update)."
+          fi
