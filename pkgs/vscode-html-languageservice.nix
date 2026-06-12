@@ -6,7 +6,7 @@
 
 buildNpmPackage rec {
   pname = "vscode-html-languageservice";
-  version = "4.10.7";
+  version = "4.10.8";
 
   src = fetchFromGitHub {
     owner = "zed-industries";
@@ -15,7 +15,7 @@ buildNpmPackage rec {
     # reliably push the v* tag (e.g. v4.10.8 was never tagged), so track the
     # release branch instead. The output hash still pins the exact content.
     rev = "release-v${version}";
-    hash = "sha256-VpCifcSg7H6d03c/BPeW1bHd7xxGff/V3P4pctcJmDY=";
+    hash = "sha256-uidW4+DZrhv6NG2DkYNQZBRK4kvUvxVEEgykkl5p+0M=";
   };
 
   npmDepsHash = "sha256-G4KROyE0OPdDCEEcZOvQbM/h7PDaBCkrlOrGIoUJ1TY=";
