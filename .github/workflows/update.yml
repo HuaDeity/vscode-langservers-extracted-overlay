@@ -50,8 +50,12 @@ jobs:
           # Re-running just force-pushes the existing PR's branch; only create
           # a PR when none is open, so real gh failures aren't masked.
           if [[ "$(gh pr list --head bump/vscode-html-languageservice --state open --json number --jq length)" == "0" ]]; then
+            # nix-update's commit message is multi-line (title + npmdiff link);
+            # only the first line belongs in the PR title.
             gh pr create \
               --head "bump/vscode-html-languageservice" \
-              --title "$(cat /tmp/commit-message)" \
-              --body "Automated version bump by [nix-update](https://github.com/Mic92/nix-update)."
+              --title "$(head -n1 /tmp/commit-message)" \
+              --body "$(tail -n +2 /tmp/commit-message)
+
+          Automated version bump by [nix-update](https://github.com/Mic92/nix-update)."
           fi
